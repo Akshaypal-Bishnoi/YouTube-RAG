@@ -20,7 +20,7 @@ app = FastAPI(title="YouTube RAG Backend")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # dev only
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
