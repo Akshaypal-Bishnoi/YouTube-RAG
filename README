@@ -1,0 +1,17 @@
+# YouTube RAG (Retrieval-Augmented Generation)
+
+A full-stack project that allows users to ask questions about YouTube videos using transcript-based semantic search and LLM-powered responses.
+
+---
+
+## 🚀 Features
+- Ask natural language questions about YouTube videos
+- Transcript-based semantic retrieval
+- FastAPI backend with vector embeddings
+- Clean HTML/CSS/JS frontend
+- Browser extension support
+- Handles transcript errors and rate limits
+
+---
+
+## 🧱 Project Structure
