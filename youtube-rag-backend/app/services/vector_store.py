@@ -1,4 +1,3 @@
-
 import os
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -15,41 +14,57 @@ def get_or_create_vector_store(video_id: str) -> FAISS:
     Load FAISS index from disk if exists,
     otherwise create it from transcript and save.
     """
+
     index_path = os.path.join(INDEX_DIR, video_id)
+    index_file = os.path.join(index_path, "index.pkl")
+
+    print(f"[INFO] Video ID: {video_id}")
+    print(f"[INFO] Index path: {index_path}")
 
     embeddings = OpenAIEmbeddings(
         model="text-embedding-3-small"
     )
 
-    # ✅ Load if exists
-    if os.path.exists(index_path):
-        return FAISS.load_local(
-            index_path,
-            embeddings,
-            allow_dangerous_deserialization=True
-        )
+    # ✅ Try loading existing index
+    try:
+        if os.path.exists(index_file):
+            print("[INFO] Loading existing FAISS index...")
+            return FAISS.load_local(
+                index_path,
+                embeddings,
+                allow_dangerous_deserialization=True
+            )
+    except Exception as e:
+        print(f"[WARNING] Failed to load index. Recreating... Error: {e}")
 
-    # ❌ Else create
+    # 🔥 Create new index if not found or failed
+    print("[INFO] Creating new FAISS index...")
+
+    # Fetch transcript
     transcript = fetch_transcript(video_id)
+
+    if not transcript:
+        raise ValueError("Transcript not found or empty.")
+
+    # Chunk transcript
     documents = chunk_transcript(transcript)
 
+    if not documents:
+        raise ValueError("No documents created from transcript.")
+
+    # Create FAISS index
     vector_store = FAISS.from_documents(
         documents,
         embeddings
     )
 
+    # Save index locally
     os.makedirs(index_path, exist_ok=True)
     vector_store.save_local(index_path)
 
+    print("[INFO] FAISS index created and saved successfully.")
+
     return vector_store
-
-
-
-
-
-
-
-
 
 
 
